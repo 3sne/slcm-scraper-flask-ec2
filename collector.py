@@ -15,6 +15,7 @@ class Collector:
     def __init__(self, u, p):
         self.setUserAndPass(u, p)
         self.setPayload()
+        self.errorDuringExtraction = False
 
     def setUserAndPass(self, u, p):
         if u != '':
