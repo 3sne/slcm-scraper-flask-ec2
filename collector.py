@@ -35,6 +35,10 @@ class Collector:
             'btnLogin': 'Sign%20in'
     }
 
+    def ensureHtmlDirExists(self):
+        if os.path.isdir(self.htmlSavePath) == False:
+            os.mkdir(self.htmlSavePath)
+
     def saveHtmlFile(self, code, appender):
         saveHtml = open((self.username + appender + '.html'), 'w+')
         saveHtml.write(code.text)
@@ -49,6 +53,7 @@ class Collector:
         self.saveHtmlFile(feeDetailsCode, 'fees')
 
     def makeReq(self):
+        self.ensureHtmlDirExists()
         if os.path.isdir(self.htmlSavePath + self.username) == False:
             os.mkdir(self.htmlSavePath + self.username)
         os.chdir(self.htmlSavePath + self.username)
