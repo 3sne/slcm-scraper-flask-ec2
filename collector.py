@@ -70,8 +70,8 @@ class Collector:
         print('cwd: ' + os.getcwd())
         newData = extractor.ExtractInstance(self.username, self.password)
         newData.scrapeEverything()
-        print('Done.')
-        print(os.name)
+        if newData.extractionError == True:
+            self.errorDuringExtraction = True
 
 if __name__ == '__main__':
     col = Collector('160905032', 'Eybitches')
