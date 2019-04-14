@@ -16,6 +16,7 @@ class Collector:
         self.setUserAndPass(u, p)
         self.setPayload()
         self.errorDuringExtraction = False
+        self.attendanceData = []
 
     def setUserAndPass(self, u, p):
         if u != '':
@@ -76,6 +77,7 @@ class Collector:
         print('cwd: ' + os.getcwd())
         newData = extractor.ExtractInstance(self.username, self.password)
         newData.scrapeEverything()
+        self.attendanceData = newData.attendanceData
         if newData.extractionError == True:
             self.errorDuringExtraction = True
 

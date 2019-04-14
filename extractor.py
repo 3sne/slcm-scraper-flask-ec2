@@ -10,6 +10,7 @@ class ExtractInstance:
         self.username = u
         self.password = p
         self.extractionError = False
+        self.attendanceData = []
 
     def scrapeEverything(self):
         # os.chdir('html/' + self.username)
@@ -91,6 +92,7 @@ class ExtractInstance:
                         v = templ[j].text
                         tempd[k] = v
                     attendanceData.append(tempd)
+                self.attendanceData = attendanceData
                 with open('html/' + self.username + '/' + self.username + 'AcadAttendanceData.csv', 'w+') as ad:
                     w = csv.DictWriter(ad, attendanceData[0].keys())
                     w.writeheader()
