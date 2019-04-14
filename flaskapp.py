@@ -32,9 +32,9 @@ def attemptSlcmLogin():
 @app.route('/test')
 def test():
     dictToSend = {'username':'160905032', 'password':'Eybitches'}
-    res = requests.post('http://localhost:5000/attemptSlcmLogin', json=dictToSend)
-    print ('response from server:',res.text)
-    return 'yay'
+    res = requests.post('http://localhost:5000/attemptSlcmLogin', data=dictToSend)
+    return res.text
 
 if __name__ == '__main__':
-  app.run()
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.run(debug=True)
