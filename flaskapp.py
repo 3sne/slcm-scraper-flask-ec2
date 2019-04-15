@@ -33,7 +33,12 @@ def go():
             if request.args.get('username') and request.args.get('password'):
                 col = collector.Collector(request.args['username'], request.args['password'])
                 col.makeReq()
-                return jsonify(col.attendanceData)
+                jWrapper = {
+                    "data": col.attendanceData,
+                    "error": "none",
+                    "code": "666"
+                }
+                return jsonify(jWrapper)
             else:
                 return render_template('slcmgo_get_response.html', bois_ip=request.remote_addr)
         except:
