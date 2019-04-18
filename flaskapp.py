@@ -14,6 +14,7 @@ def hello_world():
 
 @app.route('/go', methods=["GET","POST"])
 def go():
+    resData = {}
     if request.method == 'POST':
         print(request.form)
         try:
@@ -34,16 +35,23 @@ def go():
             if request.args.get('username') and request.args.get('password'):
                 col = collector.Collector(request.args['username'], request.args['password'])
                 col.makeReq()
-                jWrapper = {
-                    "data": col.attendanceData,
-                    "error": "none",
-                    "code": "666"
-                }
-                return jsonify(jWrapper)
+                if col.loginError:
+                    resData["code"] = "100"
+                    return jsonify(resData)
+                if col.collectionError:
+                    resData["code"] = "101"
+                    return jsonify(resData)
+                if col.errorDuringExtraction:
+                    resData["code"] = "102"
+                    return jsonify(resData)
+                resData["code"] = "666"
+                resData["data"] = col.attendanceData
+                return jsonify(resData)
             else:
                 return render_template('slcmgo_get_response.html', bois_ip=request.remote_addr)
         except:
-            return '{"error" : "server side error" , "code" : "100"}'
+            resData["code"] = "200"
+            return jsonify(resData)
 
 @app.route('/adminFetch', methods=["GET"])
 def adminFetch():
