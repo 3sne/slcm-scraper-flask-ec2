@@ -2,6 +2,7 @@
 
 * This project has some dependencies that must be installed to successfully run the scripts. They are mentioned in `requirements.txt`
 <br>
+
 * It is also recommended to create your own local python environment and load these dependencies on that venv, so that you don't end up in python version hell.<br>
 
 ### To setup your environment:
