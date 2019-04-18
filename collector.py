@@ -68,8 +68,6 @@ class Collector:
             logging.debug('START MAKING HTML FILES')
             self.gatherHtmlFiles(c)
             logging.debug('COMPLETE')
-            print('Logging out...')
-            c.get('https://slcm.manipal.edu/loginForm.aspx')
         
         print('Starting extractor...')
         print('Going to root directory from current directory ' + os.getcwd())
