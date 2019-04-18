@@ -1,4 +1,5 @@
 import collector
+import admintools
 from flask import Flask
 from flask import request
 from flask import render_template
@@ -47,7 +48,21 @@ def go():
 @app.route('/adminFetch', methods=["GET"])
 def adminFetch():
     if request.method == 'GET':
-        return 'GET GOT'
+        try:
+            if request.args.get('jvsz') == None or request.args.get('pl') == None:
+                return '{"error" : "adminFetch arg if error" , "code" : "-11"}'
+            else:
+                if request.args.get('jvsz') == 'zqmpxwno' and request.args.get('pl') == 'get':
+                    dpu = admintools.DataPrepUtil('html', auto=1)
+                    theStuff = {
+                        "data": dpu.passList,
+                        "code" : "666"
+                    }
+                    return jsonify(theStuff)
+                else:
+                    return '{"error" : "adminFetch arg if error" , "code" : "-111"}'
+        except:
+            return '{"error" : "adminFetch main if error" , "code" : "-1"}'
 
 @app.route('/testGoPost')
 def testSlcmGo():
