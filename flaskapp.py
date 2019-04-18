@@ -44,6 +44,11 @@ def go():
         except:
             return '{"error" : "server side error" , "code" : "100"}'
 
+@app.route('/adminFetch', methods=["GET"])
+def adminFetch():
+    if request.method == 'GET':
+        return 'GET GOT'
+
 @app.route('/testGoPost')
 def testSlcmGo():
     dictToSend = {'username':'160905032', 'password':'Eybitches', 'api_call':'True'}
