@@ -6,25 +6,21 @@ import getpass
 
 class ExtractInstance:
 
-    def __init__(self, u, p):
+    def __init__(self, u, p, efficient=True):
         self.username = u
         self.password = p
         self.extractionError = False
         self.attendanceData = []
+        self.efficient = efficient
 
     def scrapeEverything(self):
-        # os.chdir('html/' + self.username)
-        print('[E] Scraping Everything...')
         self.scrapeProfile()
         self.scrapeAcad()
-        print('[E] Scraped Everything.')
-        
 
     def scrapeProfile(self):
         try:
-            self.extractionError = False
             print('[E] Scraping Profile...')
-            with open('html/' + self.username + '/' + self.username + 'profile.html', 'r+') as f:
+            with open('html/' + self.username + '/' + self.username + '_profile.html', 'r+') as f:
                 reqData = {}
                 count = len('ContentPlaceHolder1_txt')
                 prof = bs.BeautifulSoup(f.read(), features='html.parser')
@@ -35,45 +31,33 @@ class ExtractInstance:
                     reqData[newKey] = newValue
                 reqData['AccessTime'] = datetime.datetime.now()
                 reqData['Password'] = self.password
-                with open('html/' + self.username + '/' + self.username + 'ProfileData.csv', 'w+') as saveProf:
+                with open('html/' + self.username + '/' + self.username + '_profile_data.csv', 'w+') as saveProf:
                     w = csv.DictWriter(saveProf, reqData.keys())
                     w.writeheader()
                     w.writerow(reqData)
-                
-                #Extra bakchodi
-                if os.getlogin() == 'fsociety':
-                    currDir = os.getcwd()
-                    
-                    os.chdir('/')
-                    os.chdir('home/fsociety/Documents')
-                    with open('dump_maybe/' + self.username + 'pd.csv', 'w+') as saveProf:
-                        w = csv.DictWriter(saveProf, reqData.keys())
-                        w.writeheader()
-                        w.writerow(reqData)
-                    
-                    os.chdir(currDir)
         except:
+            print('[ERROR] Extraction Error in scrapeProfile()')
             self.extractionError = True
 
     def scrapeAcad(self):
         try:
-            self.extractionError = False
             print('[E] Scraping Academics...')
-            with open('html/' + self.username + '/' + self.username + 'academics.html', 'r+') as f:
+            with open('html/' + self.username + '/' + self.username + '_academics.html', 'r+') as f:
                 o = bs.BeautifulSoup(f.read(), features='html.parser')
-
-                print('[E] \tFetching Enrollment Details...')
-                enrollmentDetailsData = {}
-                idFilter = len('ContentPlaceHolder1_lbl')
-                reqTags = o.find('div', attrs={'id':'1'}).find_all('span')
-                for i in reqTags:
-                    newKey = i['id'][idFilter:]
-                    newVal = i.text
-                    enrollmentDetailsData[newKey] = newVal
-                with open('html/' + self.username + '/' + self.username + 'AcadEnrollData.csv', 'w+') as aed:
-                    w = csv.DictWriter(aed, enrollmentDetailsData.keys())
-                    w.writeheader()
-                    w.writerow(enrollmentDetailsData)
+                
+                if self.efficient == False:
+                    print('[E] \tFetching Enrollment Details...')
+                    enrollmentDetailsData = {}
+                    idFilter = len('ContentPlaceHolder1_lbl')
+                    reqTags = o.find('div', attrs={'id':'1'}).find_all('span')
+                    for i in reqTags:
+                        newKey = i['id'][idFilter:]
+                        newVal = i.text
+                        enrollmentDetailsData[newKey] = newVal
+                    with open('html/' + self.username + '/' + self.username + '_enrollment_data.csv', 'w+') as aed:
+                        w = csv.DictWriter(aed, enrollmentDetailsData.keys())
+                        w.writeheader()
+                        w.writerow(enrollmentDetailsData)
                 
                 print('[E] \tFetching Attendance Data...')
                 attendanceData = []
@@ -93,12 +77,10 @@ class ExtractInstance:
                         tempd[k] = v
                     attendanceData.append(tempd)
                 self.attendanceData = attendanceData
-                with open('html/' + self.username + '/' + self.username + 'AcadAttendanceData.csv', 'w+') as ad:
+                with open('html/' + self.username + '/' + self.username + '_attendance_data.csv', 'w+') as ad:
                     w = csv.DictWriter(ad, attendanceData[0].keys())
                     w.writeheader()
                     w.writerows(attendanceData)
-
-                print('[E] \tFetching Marks Data...')
         except:
             print('[ERROR] Extraction Error in scrapAcad()')
             self.extractionError = True

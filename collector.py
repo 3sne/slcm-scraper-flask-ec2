@@ -6,23 +6,24 @@ import extractor
 
 #main vars
 class Collector:
-    initUrl = 'https://slcm.manipal.edu/loginForm.aspx'
-    username = '160905032'
-    password = 'Eybitches'
+    targetUrl = 'https://slcm.manipal.edu/loginForm.aspx'
+    username = ''
+    password = ''
     loginPayload = {}
     htmlSavePath = 'html/'
 
-    def __init__(self, u, p):
+    def __init__(self, u, p, efficient=True):
         self.setUserAndPass(u, p)
         self.setPayload()
-        self.errorDuringExtraction = False
         self.attendanceData = []
+        self.errorDuringExtraction = False
+        self.loginError = True
+        self.collectionError = False
+        self.efficient = efficient
 
     def setUserAndPass(self, u, p):
-        if u != '':
-            self.username = u
-        if p != '':
-            self.password = p
+        self.username = u
+        self.password = p
 
     def setPayload(self):
         self.loginPayload = {
@@ -41,44 +42,62 @@ class Collector:
             os.mkdir(self.htmlSavePath)
 
     def saveHtmlFile(self, code, appender):
-        saveHtml = open((self.username + appender + '.html'), 'w+')
-        saveHtml.write(code.text)
-        saveHtml.close()
+        with open((self.htmlSavePath + self.username + os.sep + self.username + appender + '.html'), 'w+') as f:
+            f.write(code.text)
+            f.close()
 
     def gatherHtmlFiles(self, c):
-        studentProfileCode = c.get('https://slcm.manipal.edu/StudentProfile.aspx')
-        academicsCode = c.get('https://slcm.manipal.edu/Academics.aspx')
-        feeDetailsCode = c.get('https://slcm.manipal.edu/FeeDetailsMIT.aspx')
-        self.saveHtmlFile(studentProfileCode, 'profile')
-        self.saveHtmlFile(academicsCode, 'academics')
-        self.saveHtmlFile(feeDetailsCode, 'fees')
+        try:
+            if self.efficient == False:
+                feeDetailsCode = c.get('https://slcm.manipal.edu/FeeDetailsMIT.aspx')
+                self.saveHtmlFile(feeDetailsCode, '_fees')
+            studentProfileCode = c.get('https://slcm.manipal.edu/StudentProfile.aspx')
+            academicsCode = c.get('https://slcm.manipal.edu/Academics.aspx')
+            self.saveHtmlFile(studentProfileCode, '_profile')
+            self.saveHtmlFile(academicsCode, '_academics')
+        except:
+            self.collectionError = True
 
     def makeReq(self):
         self.ensureHtmlDirExists()
         if os.path.isdir(self.htmlSavePath + self.username) == False:
             os.mkdir(self.htmlSavePath + self.username)
-        os.chdir(self.htmlSavePath + self.username)
 
         with requests.Session() as c:
-            logging.debug('LOGGING IN')
-            c.post(self.initUrl, data=self.loginPayload, headers={"Referer": "https://slcm.manipal.edu/loginForm.aspx"})
-            logging.debug('WE ARE IN')
-            homePageCode = c.get('https://slcm.manipal.edu/studenthomepage.aspx')
-            self.saveHtmlFile(homePageCode, '')
-            logging.debug('START MAKING HTML FILES')
-            self.gatherHtmlFiles(c)
-            logging.debug('COMPLETE')
-        
-        print('Starting extractor...')
-        print('Going to root directory from current directory ' + os.getcwd())
-        os.chdir('../..')
-        print('cwd: ' + os.getcwd())
-        newData = extractor.ExtractInstance(self.username, self.password)
-        newData.scrapeEverything()
-        self.attendanceData = newData.attendanceData
-        if newData.extractionError == True:
-            self.errorDuringExtraction = True
+            try:
+                res = c.post(self.targetUrl, data=self.loginPayload, headers={"Referer": "https://slcm.manipal.edu/loginForm.aspx"})
+                if res.url.endswith('loginForm.aspx'): #login failure
+                    self.loginError = True
+                elif res.url.endswith('studenthomepage.aspx'): #login success
+                    self.loginError = False
+                    if self.efficient == False:
+                        homePageCode = c.get('https://slcm.manipal.edu/studenthomepage.aspx')
+                        self.saveHtmlFile(homePageCode, '_homepage')
+                    self.gatherHtmlFiles(c)
+                else:
+                    self.loginError = True
+            except:
+                self.collectionError = True
+
+            if self.loginError == False and self.collectionError == False:
+                print('Starting extractor...')
+                newData = extractor.ExtractInstance(self.username, self.password)
+                newData.scrapeEverything()
+                self.attendanceData = newData.attendanceData
+                if newData.extractionError == True:
+                    self.errorDuringExtraction = True
+            else:
+                if self.loginError:
+                    print('Login Error')
+                if self.collectionError:
+                    print('Collection Error')
+    
+    def getErrorStatus(self):
+        print("[ES] LoginError: %s" % self.loginError)
+        print("[ES] CollectionError: %s" % self.collectionError)
+        print("[ES] ExtrationError: %s" % self.errorDuringExtraction)
 
 if __name__ == '__main__':
     col = Collector('160905032', 'Eybitches')
     col.makeReq()
+    col.getErrorStatus()
