@@ -4,7 +4,7 @@ import datetime
 import os
 import getpass
 
-class ExtractInstance:
+class Extractor:
 
     def __init__(self, u, p, efficient=True):
         self.username = u
@@ -36,7 +36,7 @@ class ExtractInstance:
                     w.writeheader()
                     w.writerow(reqData)
         except:
-            print('[ERROR] Extraction Error in scrapeProfile()')
+            print('[E] [ERROR] Extraction Error in scrapeProfile()')
             self.extractionError = True
 
     def scrapeAcad(self):
@@ -82,12 +82,12 @@ class ExtractInstance:
                     w.writeheader()
                     w.writerows(attendanceData)
         except:
-            print('[ERROR] Extraction Error in scrapAcad()')
+            print('[E] [ERROR] Extraction Error in scrapAcad()')
             self.extractionError = True
 
 
 if __name__ == '__main__':
     un = input('UNAME ( NO ERROR )')
     ps = getpass.getpass('PASSWORD (NO ERROR)')
-    myData = ExtractInstance(un, ps)
+    myData = Extractor(un, ps)
     myData.scrapeEverything()

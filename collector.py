@@ -80,22 +80,22 @@ class Collector:
                 self.collectionError = True
 
             if self.loginError == False and self.collectionError == False:
-                print('Starting extractor...')
-                newData = extractor.ExtractInstance(self.username, self.password)
+                print('[C] Launching extractor...')
+                newData = extractor.Extractor(self.username, self.password)
                 newData.scrapeEverything()
                 self.attendanceData = newData.attendanceData
                 if newData.extractionError == True:
                     self.errorDuringExtraction = True
             else:
                 if self.loginError:
-                    print('Login Error')
+                    print('[C] [ERROR] Login Error')
                 if self.collectionError:
-                    print('Collection Error')
+                    print('[C] [ERROR] Collection Error')
     
     def getErrorStatus(self):
-        print("[ES] LoginError: %s" % self.loginError)
-        print("[ES] CollectionError: %s" % self.collectionError)
-        print("[ES] ExtrationError: %s" % self.errorDuringExtraction)
+        print("[C] [STATUS] LoginError: %s" % self.loginError)
+        print("[C] [STATUS] CollectionError: %s" % self.collectionError)
+        print("[C] [STATUS] ExtrationError: %s" % self.errorDuringExtraction)
 
 if __name__ == '__main__':
     col = Collector('160905032', 'Eybitches')
