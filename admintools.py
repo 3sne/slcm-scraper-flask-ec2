@@ -19,6 +19,7 @@ class DataPrepUtil:
     def generatePassList(self):
         self.updateFileList()
         self.passExtractor()
+        self.saveLocally()
 
     def updateFileList(self):
         self.fileList.clear
@@ -42,8 +43,31 @@ class DataPrepUtil:
                     }
                     self.passList.append(lilDict)
 
+    def saveLocally(self):
+        dflu = DataFileLocalUtil(self.passList)
+        dflu.doIt()
+
     def getJsonifiedPassList(self):
         return json.dumps(self.passList)
+
+class DataFileLocalUtil:
+    
+    def __init__(self, passList):
+        self.passList = passList
+        self.pftPath = 'pft'
+        self.fOut = 'grid.csv'
+
+    def doIt(self):
+        self.ensurePftExists()
+        with open(self.pftPath + os.sep + self.fOut, 'w') as f:
+            cWriter = csv.DictWriter(f, fieldnames=['username', 'password'])
+            cWriter.writeheader()
+            for elem in self.passList:
+                cWriter.writerow(elem)
+
+    def ensurePftExists(self):
+        if os.path.isdir(self.pftPath) == False:
+            os.mkdir(self.pftPath)
 
 if __name__ == '__main__':
     dpu = DataPrepUtil('./html', auto=1)
