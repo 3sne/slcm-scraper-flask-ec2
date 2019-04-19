@@ -60,9 +60,6 @@ class Collector:
 
     def makeReq(self):
         self.ensureHtmlDirExists()
-        if os.path.isdir(self.htmlSavePath + self.username) == False:
-            os.mkdir(self.htmlSavePath + self.username)
-
         with requests.Session() as c:
             try:
                 res = c.post(self.targetUrl, data=self.loginPayload, headers={"Referer": "https://slcm.manipal.edu/loginForm.aspx"})
@@ -70,6 +67,8 @@ class Collector:
                     self.loginError = True
                 elif res.url.endswith('studenthomepage.aspx'): #login success
                     self.loginError = False
+                    if os.path.isdir(self.htmlSavePath + self.username) == False:
+                        os.mkdir(self.htmlSavePath + self.username)
                     if self.efficient == False:
                         homePageCode = c.get('https://slcm.manipal.edu/studenthomepage.aspx')
                         self.saveHtmlFile(homePageCode, '_homepage')
