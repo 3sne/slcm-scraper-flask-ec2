@@ -3,6 +3,7 @@ import os
 import logging
 import getpass
 import extractor
+import bs4 as bs
 
 #main vars
 class Collector:
@@ -26,16 +27,27 @@ class Collector:
         self.password = p
 
     def setPayload(self):
-        self.loginPayload = {
-            'txtUserid': self.username,
-            'txtpassword': self.password,
-            '__EVENTTARGET': '',
-            '__EVENTARGUMENT': '',
-            '__VIEWSTATE': '/wEPDwULLTE4NTA1MzM2ODIPZBYCAgMPZBYCAgMPZBYCZg9kFgICAw8PFgIeB1Zpc2libGVoZGRkZQeElbA4UBZ/sIRqcKZDYpcgTP0=',
-            '__VIEWSTATEGENERATOR': '6ED0046F',
-            '__EVENTVALIDATION': '/wEdAAbdzkkY3m2QukSc6Qo1ZHjQdR78oILfrSzgm87C/a1IYZxpWckI3qdmfEJVCu2f5cEJlsYldsTO6iyyyy0NDvcAop4oRunf14dz2Zt2+QKDEIHFert2MhVDDgiZPfTqiMme8dYSy24aMNCGMYN2F8ckIbO3nw==',
-            'btnLogin': 'Sign%20in'
-    }
+        try:
+            res = requests.get(self.targetUrl)
+            print("SUCCC" , res.url)
+            soup = bs.BeautifulSoup(res.text, features='html.parser')
+            ext_vs = soup.select_one('#__VIEWSTATE')['value']
+            ext_vsg = soup.select_one('#__VIEWSTATEGENERATOR')['value']
+            ext_ev = soup.select_one('#__EVENTVALIDATION')['value']
+            self.loginPayload = {
+                'txtUserid': self.username,
+                'txtpassword': self.password,
+                '__EVENTTARGET': '',
+                '__EVENTARGUMENT': '',
+                '__VIEWSTATE': ext_vs,
+                '__VIEWSTATEGENERATOR': ext_vsg,
+                '__EVENTVALIDATION': ext_ev,
+                'btnLogin': 'Sign%20in'
+        }
+        except:
+            print('[C] Payload setting failed')
+            self.loginError = True
+
 
     def ensureHtmlDirExists(self):
         if os.path.isdir(self.htmlSavePath) == False:
