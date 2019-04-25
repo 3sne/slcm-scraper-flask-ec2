@@ -29,7 +29,12 @@ $ source venv_name1/bin/activate
 (venv_name) $ pip install -r requirements.txt
 ```
 
-5. To deactivate venv later on (brings back normal prompt)
+5. Update requirements.txt if you installed some new dev dependencies
+```
+(venv_name) $ pip freeze > requirements.txt
+```
+
+6. To deactivate venv later on (brings back normal prompt)
 ```
 (venv_name) $ deactivate
 ```
