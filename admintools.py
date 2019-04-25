@@ -9,7 +9,7 @@ class DataPrepUtil:
         self.listRegistrationNumberAndPasswords = []
         self.fileList = []
         self.passList = []
-        self.fileAppender = 'ProfileData.csv'
+        self.fileAppender = '_profile_data.csv'
         for key, val in kwargs.items():
             if key == 'auto' and val == 1:
                 self.generatePassList()
