@@ -1,4 +1,5 @@
 .vscode
+keystore/af_private_key.pem
 html/
 __pycache__/
 pft/

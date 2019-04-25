@@ -1,6 +1,10 @@
 import csv
 import os
 import json
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
 
 class DataPrepUtil:
 
@@ -10,11 +14,16 @@ class DataPrepUtil:
         self.fileList = []
         self.passList = []
         self.fileAppender = '_profile_data.csv'
+        self.loadPublicKey()
         for key, val in kwargs.items():
             if key == 'auto' and val == 1:
                 self.generatePassList()
             if key == 'searchfor':
                 self.fileAppender = val
+
+    def loadPublicKey(self):
+        with open("keystore/af_public_key.pem", "rb") as key_file:
+            self.af_public_key = serialization.load_pem_public_key(key_file.read(), backend=default_backend())
 
     def generatePassList(self):
         self.updateFileList()
@@ -36,10 +45,12 @@ class DataPrepUtil:
                 cReader = csv.DictReader(f)
                 for row in cReader:
                     regNo = row['ApplicationNumber']
+                    enc_regNo = self.af_public_key.encrypt(regNo.encode(), padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
                     pw = row['Password']
+                    enc_pw = self.af_public_key.encrypt(pw.encode(), padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
                     lilDict = {
-                        "username" : regNo,
-                        "password": pw
+                        "username" : str(enc_regNo),
+                        "password": str(enc_pw)
                     }
                     self.passList.append(lilDict)
 
