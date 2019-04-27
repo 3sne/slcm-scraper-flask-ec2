@@ -95,6 +95,7 @@ class Collector:
                 newData = extractor.Extractor(self.username, self.password)
                 newData.scrapeEverything()
                 self.attendanceData = newData.attendanceData
+                self.marksData = newData.marksData
                 if newData.extractionError == True:
                     self.errorDuringExtraction = True
             else:
