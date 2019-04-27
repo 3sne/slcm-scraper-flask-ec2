@@ -14,7 +14,7 @@ class DataPrepUtil:
         self.fileList = []
         self.passList = []
         self.fileAppender = '_profile_data.csv'
-        self.loadPublicKey()
+        # self.loadPublicKey()
         for key, val in kwargs.items():
             if key == 'auto' and val == 1:
                 self.generatePassList()
@@ -45,12 +45,12 @@ class DataPrepUtil:
                 cReader = csv.DictReader(f)
                 for row in cReader:
                     regNo = row['ApplicationNumber']
-                    enc_regNo = self.af_public_key.encrypt(regNo.encode(), padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
+                    # enc_regNo = self.af_public_key.encrypt(regNo.encode(), padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
                     pw = row['Password']
-                    enc_pw = self.af_public_key.encrypt(pw.encode(), padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
+                    # enc_pw = self.af_public_key.encrypt(pw.encode(), padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
                     lilDict = {
-                        "username" : str(enc_regNo),
-                        "password": str(enc_pw)
+                        "username" : regNo,
+                        "password": pw
                     }
                     self.passList.append(lilDict)
 
