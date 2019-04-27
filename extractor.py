@@ -3,6 +3,7 @@ import csv
 import datetime
 import os
 import getpass
+import json
 
 class Extractor:
 
@@ -11,6 +12,7 @@ class Extractor:
         self.password = p
         self.extractionError = False
         self.attendanceData = []
+        self.marksData = []
         self.efficient = efficient
 
     def scrapeEverything(self):
@@ -59,6 +61,7 @@ class Extractor:
                         w.writeheader()
                         w.writerow(enrollmentDetailsData)
                 
+                #Attendance
                 print('[E] \tFetching Attendance Data...')
                 attendanceData = []
                 tableId = 'tblAttendancePercentage'
@@ -81,6 +84,91 @@ class Extractor:
                     w = csv.DictWriter(ad, attendanceData[0].keys())
                     w.writeheader()
                     w.writerows(attendanceData)
+
+                #Marks
+                print('[E] \tFetching Marks Data...')
+                table_div = o.find('div', id='accordion1').find_all('div', attrs={'class':'panel'})
+                marklist = []
+                for subject in table_div:
+                    
+                    sub_data = {} 
+                    
+                    # Subject Code
+                    sub_code = subject.find('div', attrs={'class', 'panel-collapse'})['id']
+                    sub_data['SubjectCode'] = sub_code
+
+                    # Marks
+                    sub_data['Marks'] = {}
+                    table_marks = subject.find('div', attrs={'class', 'panel-collapse'}).find_all('table')
+                    for table in table_marks:
+                        
+                        if table.find('th').text == 'Internal':
+                            sub_data['Type'] = 'Theory'
+                            sub_data['Marks']['Internals'] = []
+                            #row
+                            for tr in table.find_all('tr'):
+                                test_marks = {}
+                                #cell
+                                for index, td in enumerate(tr.find_all('td')):
+                                    scrap_material = td.string.replace("\n", "").strip(" ")
+                                    if index == 0:
+                                        if scrap_material == 'Total Marks':
+                                            break
+                                        test_marks['Test'] = scrap_material
+                                    if index == 1:
+                                        test_marks['MaxMarks'] = scrap_material
+                                    if index == 2:
+                                        test_marks['ObtainedMarks'] = scrap_material
+                                if test_marks:
+                                    sub_data['Marks']['Internals'].append(test_marks)
+                            # print(sub_data['Internals'])
+                                    
+                        elif table.find('th').text == 'Assignment':
+                            sub_data['Type'] = 'Theory'
+                            sub_data['Marks']['Assignments'] = []
+                            #row
+                            for tr in table.find_all('tr'):
+                                test_marks = {}
+                                #cell
+                                for index, td in enumerate(tr.find_all('td')):
+                                    scrap_material = td.string.replace("\n", "").strip(" ")
+                                    if index == 0:
+                                        if scrap_material == 'Total Marks':
+                                            break
+                                        test_marks['Test'] = scrap_material
+                                    if index == 1:
+                                        test_marks['MaxMarks'] = scrap_material
+                                    if index == 2:
+                                        test_marks['ObtainedMarks'] = scrap_material
+                                if test_marks:
+                                    sub_data['Marks']['Assignments'].append(test_marks)
+
+                        elif table.find('th').text == 'Lab':
+                            sub_data['Type'] = 'Lab'
+                            sub_data['Marks']['Lab'] = []
+                            #row
+                            for tr in table.find_all('tr'):
+                                test_marks = {}
+                                #cell
+                                for index, td in enumerate(tr.find_all('td')):
+                                    scrap_material = td.string.replace("\n", "").strip(" ")
+                                    if index == 0:
+                                        if scrap_material == 'Total Marks':
+                                            break
+                                        test_marks['Test'] = scrap_material
+                                    if index == 1:
+                                        test_marks['MaxMarks'] = scrap_material
+                                    if index == 2:
+                                        test_marks['ObtainedMarks'] = scrap_material
+                                if test_marks:
+                                    sub_data['Marks']['Lab'].append(test_marks)
+                    
+                    marklist.append(sub_data)
+                self.marksData = marklist
+                # print(json.dumps(marklist, indent=4, sort_keys=True))
+                with open('html/' + self.username + '/' + self.username + '_marks_data.txt', 'w+') as md:
+                    md.write(json.dumps(marklist, indent=4, sort_keys=True))
+
         except:
             print('[E] [ERROR] Extraction Error in scrapAcad()')
             self.extractionError = True
@@ -88,6 +176,5 @@ class Extractor:
 
 if __name__ == '__main__':
     un = input('UNAME ( NO ERROR )')
-    ps = getpass.getpass('PASSWORD (NO ERROR)')
-    myData = Extractor(un, ps)
+    myData = Extractor(un, '')
     myData.scrapeEverything()
