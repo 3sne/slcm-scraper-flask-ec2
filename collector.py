@@ -77,7 +77,7 @@ class Collector:
                 res = c.post(self.targetUrl, data=self.loginPayload, headers={"Referer": "https://slcm.manipal.edu/loginForm.aspx"})
                 if res.url.endswith('loginForm.aspx'): #login failure
                     self.loginError = True
-                elif res.url.endswith('studenthomepage.aspx'): #login success
+                else: #login success
                     self.loginError = False
                     if os.path.isdir(self.htmlSavePath + self.username) == False:
                         os.mkdir(self.htmlSavePath + self.username)
@@ -85,8 +85,8 @@ class Collector:
                         homePageCode = c.get('https://slcm.manipal.edu/studenthomepage.aspx')
                         self.saveHtmlFile(homePageCode, '_homepage')
                     self.gatherHtmlFiles(c)
-                else:
-                    self.loginError = True
+                # else:
+                #     self.loginError = True
             except:
                 self.collectionError = True
 
