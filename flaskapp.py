@@ -13,20 +13,12 @@ app.secret_key = b'\xad,O\t\xcc:}\xae\xc846\x83K]\xe0\xd7\xb8)4\x08\xdc*i\xe5\x9
 def hello_world():
   return 'Hello Child'
 
-@app.route('/go', methods=["GET","POST"])
+@app.route('/go', methods=["GET"])
 def go():
     resData = {}
     ext_uname = ''
     ext_pw = ''
-    if request.method == 'POST':
-        try:
-            if request.form.get('slcm_username') and request.form.get('slcm_password'):
-                ext_uname = request.form.get('slcm_username')
-                ext_pw = request.form.get('slcm_password')
-        except:
-            resData["code"] = "201"
-            return jsonify(resData)
-    elif request.method == 'GET':
+    if request.method == 'GET':
         try:
             if request.args.get('username') and request.args.get('password'):
                 ext_uname = request.args.get('username')
