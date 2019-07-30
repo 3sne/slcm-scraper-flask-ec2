@@ -110,6 +110,8 @@ class Collector:
         print("[C] [STATUS] ExtrationError: %s" % self.errorDuringExtraction)
 
 if __name__ == '__main__':
-    col = Collector('160905032', 'Eybitches')
+    un = input('UNAME > ')
+    ps = input('PW > ')
+    col = Collector(un, ps)
     col.makeReq()
     col.getErrorStatus()
