@@ -7,7 +7,6 @@ from flask import jsonify
 from collections import Counter
 import requests
 app = Flask(__name__)
-app.secret_key = b'\xad,O\t\xcc:}\xae\xc846\x83K]\xe0\xd7\xb8)4\x08\xdc*i\xe5\x9f\x0c\x94\xc8\x1f\xbd\x01\x95'
 
 @app.route('/')
 def hello_world():
@@ -93,16 +92,6 @@ def adminFetch():
                     return '{"error" : "adminFetch arg if error" , "code" : "-111"}'
         except:
             return '{"error" : "adminFetch main if error" , "code" : "-1"}'
-
-@app.route('/testGoPost')
-def testGoPost():
-    res = requests.post('http://localhost:5000/go', data={'slcm_username':'160905032', 'slcm_password':'Eybitches', 'a_call':'true'})
-    return res.text
-
-@app.route('/testGoGet')
-def testGoGet():
-    res = requests.get('http://localhost:5000/go?username=160905032&password=Eybitches')
-    return res.text
 
 if __name__ == '__main__':
     app.config['TEMPLATES_AUTO_RELOAD'] = True
